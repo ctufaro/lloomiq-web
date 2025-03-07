@@ -33,6 +33,10 @@
             letter-spacing: 1px;
             color: #0078D4;
         }
+	.logo img {
+            height: 40px;
+    	    object-fit: contain;
+	}
         nav a {
             margin-left: 20px;
             text-decoration: none;
@@ -114,7 +118,11 @@
 <body>
 
 <header>
-    <div class="logo">Lloomiq</div>
+    <div class="logo">
+        <a href="/">
+            <img src="logo.png" alt="Lloomiq Logo">
+        </a>
+    </div>
     <nav>
         <a href="#">Home</a>
         <a href="#about">About Us</a>
