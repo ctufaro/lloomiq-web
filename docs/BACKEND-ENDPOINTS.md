@@ -1,10 +1,10 @@
 # Website backend handoff
 
-Reviewed: October 8, 2026.
+Reviewed: October 9, 2026.
 
 ## Current scope
 
-The website needs one public endpoint to submit the contact form. The form in `public/index.html` now posts JSON through `public/assets/js/script.js`. Local previews use `http://localhost:7071/api/contact`; deployed hosts use `https://azurefx.azurewebsites.net/api/contact`. The backend handles delivery. Live delivery still needs verification.
+The website needs one public endpoint to submit the contact form. The form in `public/index.html` posts JSON through `public/assets/js/script.js`. Local previews use `http://localhost:7071/api/contact`; deployed hosts use `https://azurefx.azurewebsites.net/api/contact`. The backend handles delivery. Live API acceptance and validation were verified on October 9, 2026; mailbox delivery still needs verification.
 
 Navigation, service descriptions, the portrait, and other assets need no custom backend endpoints. `workflow-demo.html` contains fixed fictional data and a button that reveals predetermined results. It needs no backend for its current behavior. There are no accounts, uploads, booking flows, or newsletter signup forms in the current website.
 
@@ -58,15 +58,15 @@ Direct provider acceptance: `200 OK`.
 }
 ```
 
-If using durable asynchronous delivery, return `202 Accepted` with the same response shape only after enqueueing succeeds. No public polling endpoint is needed for the current contact experience.
+The current frontend requires HTTP 200 with `status: "accepted"` before showing success or clearing the form. HTTP 202 or any other unexpected success response preserves values and displays a friendly error. No public polling endpoint is needed for the current contact experience.
 
 | Status | Meaning | Frontend behavior |
 | --- | --- | --- |
-| 400 | Invalid JSON or fields | Show validation guidance; retain entered values. |
-| 413 | Request too large | Ask the visitor to shorten the message. |
-| 415 | Unsupported content type | Show a submission error; retain entered values. |
-| 429 | Too many requests | Ask the visitor to retry later; honor `Retry-After` when supplied. |
-| 503 | Email provider or queue unavailable | Show retry guidance and the direct email fallback; retain entered values. |
+| 400 | Invalid JSON or fields | Show `error.message` and inline `error.fields` when supplied; retain values. |
+| 413 | Request too large | Show `error.message`; retain values. |
+| 415 | Unsupported content type | Show `error.message`; retain values. |
+| 429 | Too many requests | Show `error.message`; retain values; no automatic retry. |
+| 503 | Email provider or queue unavailable | Show `error.message`; retain values. |
 
 Example validation response:
 
@@ -88,7 +88,7 @@ Keep internal exception details and provider credentials out of responses. Unexp
 
 - This is a public visitor form; do not require a visitor account or put a Function key or email-provider secret in browser JavaScript. Enforce abuse controls on the server or gateway.
 - Apply rate limits using a trustworthy client-IP source from the deployment's ingress. CORS alone does not prevent spam.
-- If frontend and backend use separate origins, configure CORS for the actual production website origin and explicit development origins. Support preflight requests as needed. If using a same-origin API route, the frontend can call `/api/contact`.
+- Configure CORS for the actual production website origin and explicit development origins. Support preflight requests as needed. The frontend uses the absolute Azure Functions URL, not a relative `/api/contact` route.
 - Keep provider credentials and recipient/sender configuration in server-side configuration.
 - Log submission ID, timestamp, processing status, and operational errors. Avoid logging full messages or email addresses by default.
 - If submissions are stored, define retention and access permissions before launch.

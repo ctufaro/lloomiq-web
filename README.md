@@ -38,9 +38,15 @@ Open http://localhost:8000. The comparison demo is available at `/workflow-demo.
 - Other hosts use `https://azurefx.azurewebsites.net/api/contact`.
 - Set `apiEnvironment` to `local` or `production` to override detection.
 
-The form posts JSON with `name`, `email`, `business`, and `message`. Failed submissions preserve entered values. The direct email link remains available. See [the backend contract](docs/BACKEND-ENDPOINTS.md) for validation and delivery behavior.
+The form posts trimmed JSON with `name`, `email`, `business`, and `message` to the absolute endpoint URL, without credentials or cookies. It shows inline validation errors, prevents concurrent submissions, and clears values only after HTTP 200 with `status: "accepted"`. Failed submissions preserve entered values; requests are never automatically retried. The direct email link remains available. See [the backend contract](docs/BACKEND-ENDPOINTS.md) for validation and delivery behavior.
 
 Configure the backend to accept requests from the website's production origin and local preview origin. Run the local Functions project separately when testing local form submission.
+
+## Verification
+
+Run `node --test tests/contact.test.cjs` for contact submission and error-state checks. No dependencies are required. These use a simulated DOM and API responses; check browser CORS from the deployed website separately.
+
+On October 9, 2026, the deployed Azure endpoint returned HTTP 200 with `status: "accepted"` for a labeled integration test and HTTP 400 with field errors for invalid input. This verifies API acceptance, not mailbox delivery.
 
 ## Deployment
 
