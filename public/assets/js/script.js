@@ -38,7 +38,7 @@ function showErrors(errors) {
   }
   first?.focus();
 }
-const friendlyError = 'We could not confirm submission. Your details are still here. Please try again or email hello@lloomiq.com.';
+const friendlyError = 'We could not confirm submission. Your details are still here. Please try again later.';
 let submitting = false;
 form.addEventListener('submit', async (event) => {
   event.preventDefault();
@@ -77,7 +77,7 @@ form.addEventListener('submit', async (event) => {
     status.textContent = !response.ok && typeof result?.error?.message === 'string' && result.error.message ? result.error.message : friendlyError;
     if (response.status === 400) showErrors(result?.error?.fields);
   } catch (error) {
-    status.textContent = error.name === 'AbortError' ? 'The request timed out, so we could not confirm submission. Your details are still here. Email hello@lloomiq.com or retry, which may submit a duplicate.' : friendlyError;
+    status.textContent = error.name === 'AbortError' ? 'The request timed out, so we could not confirm submission. Your details are still here. If you retry, it may submit a duplicate.' : friendlyError;
   } finally {
     clearTimeout(timeout);
     submitting = false;
